@@ -3,7 +3,7 @@ up-or-text
 
 monitor a url and start txting if it goes down.
 
-This will monitor www.google.com and start txting you if google returns a non 200 more than 3 times in a row.  It will continue to every 10 minutes until it is back up.
+This will monitor www.google.com and start txting you if google returns a non-200 more than 3 times in a row.  It will continue to txt you every 10 minutes until it is back up.
 
 
 ```js
