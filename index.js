@@ -53,12 +53,12 @@ function Watcher(params){
 		request
 			.get(params.url)
 			.end(function(err, res){
-				if (err || !res.body || !res.body.success){
+				if (err || !res.ok){
 					failureCount++;
-					console.log('skyjuice is down. ' + failureCount);
+					console.log('"'+params.url + '" is down. ' + failureCount);
 				} else {
 					failureCount = 0;
-					console.log('skyjuice is up.');
+					console.log('"'+params.url + '" is up.');
 				}
 
 				if (failureCount > params.maxFailureCount){
