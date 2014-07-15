@@ -1,7 +1,7 @@
 {
   "name": "up-or-txt",
-  "version": "0.0.2",
-  "description": "",
+  "version": "0.0.3",
+  "description": "up-or-text",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +12,22 @@
     "lodash": "^2.4.1",
     "superagent": "^0.18.1",
     "twilio": "^1.6.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chevett/up-or-txt"
+  },
+  "keywords": [
+    "monitor",
+    "monitoring",
+    "txt",
+    "text-message",
+    "twilio",
+    "ping"
+  ],
+  "bugs": {
+    "url": "https://github.com/chevett/up-or-txt/issues"
+  },
+  "homepage": "https://github.com/chevett/up-or-txt"
 }
