@@ -1,11 +1,16 @@
 up-or-text
 ==========
 
-monitor a url and start txting if it goes down.
-
-This will monitor www.google.com and start txting you if google returns a non-200 more than 3 times in a row.  It will continue to txt you every 10 minutes until it is back up.
+Monitor a url and start txting if it goes down.
 
 
+You can get this working with a free twilio account.
+
+```
+npm install up-or-txt
+```
+
+The example below will monitor https://www.google.com and start txting you if google returns a non-200 more than 3 times in a row.  It will continue to txt you every 10 minutes until it is back up.
 ```js
 var watch = require('up-or-txt');
 
