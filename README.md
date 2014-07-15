@@ -1,4 +1,4 @@
-up-or-text
+up-or-txt
 ==========
 
 Monitor a url and start txting if it goes down.
