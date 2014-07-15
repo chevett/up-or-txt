@@ -1,10 +1,7 @@
 up-or-txt
 ==========
 
-Monitor a url and start txting if it goes down.
-
-
-You can get this working with a free twilio account.
+Monitor a url and start txting if it goes down.  You can get this working with a free twilio account.
 
 ```
 npm install up-or-txt
