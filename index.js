@@ -1,6 +1,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 var Twilio = require('twilio'),
+	log = require('debug')('up-or-txt'),
 	EventEmitter = require('events').EventEmitter,
 	request = require('superagent'),
 	_ = require('lodash');
@@ -18,36 +19,52 @@ var DEFAULTS = {
 	message: 'your site is down!'
 };
 
-var failureCount = 0;
+var runIfDifferent = function(fn){
+	var lastArgs;
+	return function(){
+		var currentArgs = _.toArray(arguments);
+		if (_.isEqual(currentArgs, lastArgs)) return;
+
+		lastArgs = currentArgs;
+		fn.apply(null, currentArgs);
+	};
+};
 
 function Watcher(params){
 	params = _.extend({}, DEFAULTS, params);
 
+	var failureCount = 0;
+	var log = runIfDifferent(console.log.bind(console));
 	var emitter = new EventEmitter();
-	var twilio = Twilio(params.twilio.sid, params.twilio.token);
-	var _toFailureTxt = function(number){
-		return _.extend({}, {to: number, from: params.twilio.number, body: params.message});
+	var twilio = new Twilio(params.twilio.sid, params.twilio.token);
+	var MESSAGE_DEFAULTS = {from: params.twilio.number, body: params.message};
+
+	var _createFailTxtMessage = function(toNumber){
+		return _.extend({}, MESSAGE_DEFAULTS, {to: toNumber});
 	};
 
-	var _sendFailureMessages = function(){
-		if (failureCount === 0) return;
-
-		console.log('sending alerts');
-
-		params.phones
-			.map(_toFailureTxt)
-			.forEach(function(msg){
-				twilio.sms.messages.create(msg, function(error, result) {
-					if (error){
-						console.error(error);
-					} else {
-						console.log('txt sent success.');
-					}
-				});
+	var _sendTxtMessage = function(txtMessage){
+		twilio.sms.messages.create(txtMessage, function(err) {
+			if (err){
+				emitter.emit('txt-error', err);
+				console.error(err);
+			} else {
+				emitter.emit('txt-success', err);
+				log('txt sent success.');
+			}
 		});
 	};
 
-	_sendFailureMessages = _.throttle(_sendFailureMessages, params.txtInterval);
+	var _sendFailureMessages = _.throttle(function(){
+		if (failureCount === 0) return;
+
+		log('sending alerts');
+
+		params.phones
+			.map(_createFailTxtMessage)
+			.forEach(_sendTxtMessage);
+
+	}, params.txtInterval);
 
 	var _doCheck = function(){
 		request
@@ -55,10 +72,14 @@ function Watcher(params){
 			.end(function(err, res){
 				if (err || !res.ok){
 					failureCount++;
-					console.log('"'+params.url + '" is down. ' + failureCount);
+					if (failureCount > params.maxFailureCount){
+						log('"'+params.url + '" is down. ');
+					} else {
+						log('"'+params.url + '" failed to respond. ' + failureCount);
+					}
 				} else {
 					failureCount = 0;
-					console.log('"'+params.url + '" is up.');
+					log('"'+params.url + '" is up.');
 				}
 
 				if (failureCount > params.maxFailureCount){
