@@ -50,7 +50,6 @@ function Watcher(params){
 				console.error(err);
 			} else {
 				emitter.emit('txt-success', err);
-				log('txt sent success.');
 			}
 		});
 	};
@@ -58,7 +57,7 @@ function Watcher(params){
 	var _sendFailureMessages = _.throttle(function(){
 		if (failureCount === 0) return;
 
-		log('sending alerts');
+		console.log('sending txts');
 
 		params.phones
 			.map(_createFailTxtMessage)
@@ -72,9 +71,7 @@ function Watcher(params){
 			.end(function(err, res){
 				if (err || !res.ok){
 					failureCount++;
-					if (failureCount > params.maxFailureCount){
-						log('"'+params.url + '" is down. ');
-					} else {
+					if (failureCount <= params.maxFailureCount){
 						log('"'+params.url + '" failed to respond. ' + failureCount);
 					}
 				} else {
@@ -83,6 +80,7 @@ function Watcher(params){
 				}
 
 				if (failureCount > params.maxFailureCount){
+					log('"'+params.url + '" is down. ');
 					_sendFailureMessages();
 				}
 
